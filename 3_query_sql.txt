@@ -1,0 +1,26 @@
+WITH base
+AS (SELECT * FROM tb_listings
+LEFT JOIN tb_leads
+ON tb_listings.listing_id = tb_leads.listing_id)
+
+SELECT portal AS "Portal", SUM (leads) AS "Total de Leads" 
+FROM base
+GROUP BY portal
+
+;
+
+WITH base
+AS (SELECT "city" AS cidade, COUNT ("city") AS "total de anúncios cidade"
+    FROM tb_listings GROUP BY "city")
+
+SELECT "city", "neighborhood", "total de anúncios bairro", "total de anúncios cidade",
+ (CAST ("total de anúncios bairro" AS FLOAT) / CAST ("total de anúncios cidade" AS FLOAT) * 100) AS "%"
+FROM
+(SELECT "city",
+ "neighborhood",
+   COUNT ( "neighborhood") AS "total de anúncios bairro"
+FROM tb_listings
+GROUP BY "city", "neighborhood"
+ORDER BY "city", "neighborhood") AS Resultado
+LEFT JOIN base
+ON Resultado.city = base.cidade
